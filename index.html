@@ -6,9 +6,10 @@
   <title>Suez Store</title><link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0f6b53">
   <style>
-    body { font-family: sans-serif; background: #f1f4f1; margin: 0; padding: 16px; padding-bottom: 90px; }
-    h1 { color: #0f6b53; margin-top: 4px; }
-    input, textarea { width: 100%; padding: 10px; font-size: 16px; margin-bottom: 12px; box-sizing: border-box; font-family: inherit; }
+    body { font-family: sans-serif; background: #f1f4f1; margin: 0; padding: 16px 16px 90px; }
+    h1 { color: #0f6b53; margin: 0 0 4px; }
+    .sub { color: #6b7570; font-size: 14px; margin-bottom: 12px; }
+    input, textarea { width: 100%; padding: 10px; font-size: 16px; margin-bottom: 10px; box-sizing: border-box; font-family: inherit; }
     .cats { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 12px; }
     .cats button { flex: none; padding: 8px 16px; border: 1px solid #0f6b53; background: white; color: #0f6b53; border-radius: 20px; font-size: 15px; }
     .cats button.on { background: #0f6b53; color: white; }
@@ -23,7 +24,6 @@
     .qty { display: inline-flex; align-items: center; gap: 12px; margin-top: 8px; }
     .qty button { width: 36px; height: 36px; border: 1px solid #0f6b53; background: white; color: #0f6b53; border-radius: 8px; font-size: 20px; }
     .qty span { min-width: 20px; text-align: center; font-size: 17px; }
-    .empty { text-align: center; color: #6b7570; padding: 30px 0; }
     #bar { position: fixed; bottom: 0; left: 0; right: 0; background: #0f6b53; color: white; padding: 14px 16px; display: none; justify-content: space-between; align-items: center; font-size: 17px; }
     #bar button { background: white; color: #0f6b53; border: 0; padding: 10px 18px; border-radius: 8px; font-size: 16px; font-weight: bold; }
     #sheet { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.5); display: none; align-items: flex-end; z-index: 10; }
@@ -34,19 +34,19 @@
     .total { font-size: 20px; font-weight: bold; margin: 14px 0; }
     .send { width: 100%; padding: 14px; border: 0; border-radius: 10px; background: #25a244; color: white; font-size: 18px; font-weight: bold; }
     .close { width: 100%; padding: 12px; margin-top: 8px; border: 0; background: none; color: #6b7570; font-size: 15px; }
-    .foot { text-align: center; color: #6b7570; font-size: 13px; padding: 10px; }
+    .empty { text-align: center; color: #6b7570; padding: 30px 0; }
   </style>
 </head>
 <body>
   <h1>Suez Store</h1>
+  <div class="sub" id="info"></div>
   <input id="search" placeholder="دوّر على منتج">
   <div class="cats" id="cats"></div>
   <div id="list"></div>
-  <div class="foot" id="foot"></div>
 
   <div id="bar"><span id="barText"></span><button onclick="openCart()">عرض السلة</button></div>
 
-  <div id="sheet" onclick="if (event.target === this) closeCart()">
+  <div id="sheet" onclick="if(event.target===this)closeCart()">
     <div id="box">
       <h2>سلة المشتريات</h2>
       <div id="items"></div>
@@ -60,34 +60,34 @@
   </div>
 
   <script>
-    // ===== إعدادات المحل: غيّرها =====
-    // رقم الواتساب بالصيغة الدولية بدون + ولا صفر في الأول. مثال: 201012345678
-    var SHOP = { whatsapp: "201000000000", address: "السويس", phone: "01000000000" };
+    // ===== غيّر بيانات المحل هنا =====
+    // الواتساب: بالصيغة الدولية بدون + ولا صفر. مثال: 201012345678
+    var SHOP = { whatsapp: "201000000000", phone: "01000000000", address: "السويس" };
 
-    // cat = التصنيف | qty = الكمية (0 = خلصان) | from: true = السعر "يبدأ من"
-    // img = اسم ملف الصورة اللي هترفعها على GitHub جنب index.html
+    // cat = التصنيف | img = اسم ملف الصورة اللي هترفعها على GitHub جنب index.html
+    // qty = الكمية المتاحة (0 = خلصان) | from:true لو السعر "يبدأ من"
     var products = [
-        { cat: "لمبات", name: "لمبات فينوس وسبرينت ليد (من 45 إلى 276 جنيه حسب النوع)", price: 45, from: true, qty: 10, img: "lamps-venus.jpg" },
-        { cat: "مفاتيح", name: "مفتاح سخان جي فينوس 20 أمبير", price: 149, qty: 10, img: "switch-heater.jpg" },
-        { cat: "مفاتيح", name: "مفتاح تكييف باللمبة 45 أمبير", price: 444, qty: 10, img: "switch-ac.jpg" },
-        { cat: "مفاتيح", name: "مفتاح ثلاثي عادي باللمبة 16 أمبير", price: 151, qty: 10, img: "switch-triple.jpg" },
-        { cat: "مفاتيح", name: "مفتاح مروحة جي فينوس", price: 781, qty: 10, img: "switch-fan.jpg" },
-        { cat: "بريزات", name: "بريزة شوكو بمفتاح وفصل ولمبة إشارة 16A", price: 260, qty: 10, img: "socket-choco.jpg" },
-        { cat: "بريزات", name: "بريزة قوة سمارت واي فاي", price: 1060, qty: 10, img: "socket-smart.jpg" },
-        { cat: "بريزات", name: "بريزة USB مجوز 2A", price: 788, qty: 10, img: "socket-usb.jpg" },
-        { cat: "بريزات", name: "بريزة أرضي والأمان (بيج) 16A", price: 59, qty: 10, img: "socket-earth.jpg" },
-        { cat: "بريزات", name: "بريزة إنترنت CAT6", price: 195, qty: 10, img: "socket-cat6.jpg" },
-        { cat: "وشوش", name: "وشوش جي فينوس كلاسيك / جلاكسي / سكاي (من 28 إلى 72 جنيه حسب المقاس)", price: 28, from: true, qty: 10, img: "faceplates.jpg" },
-        { cat: "سبوت وبانيل", name: "سبوت لايت مدور متحرك 6 وات", price: 140, qty: 10, img: "spotlight.jpg" },
-        { cat: "سبوت وبانيل", name: "سبوت لايت مدور متحرك 9 وات", price: 165, qty: 10, img: "spotlight.jpg" },
-        { cat: "سبوت وبانيل", name: "سبوت لايت مدور متحرك 20 وات", price: 390, qty: 10, img: "spotlight.jpg" },
-        { cat: "سبوت وبانيل", name: "سبوت لايت مدور متحرك 30 وات", price: 550, qty: 10, img: "spotlight.jpg" },
-        { cat: "سبوت وبانيل", name: "بانيل مدور 6 وات", price: 125, qty: 10, img: "panel-round.jpg" },
-        { cat: "سبوت وبانيل", name: "بانيل مدور 9 وات", price: 145, qty: 10, img: "panel-round.jpg" },
-        { cat: "سبوت وبانيل", name: "بانيل مدور 12 وات", price: 175, qty: 10, img: "panel-round.jpg" },
-        { cat: "سبوت وبانيل", name: "بانيل مدور 18 وات", price: 225, qty: 10, img: "panel-round.jpg" },
-        { cat: "سبوت وبانيل", name: "بانيل مدور 24 وات", price: 310, qty: 10, img: "panel-round.jpg" },
-        { cat: "سبوت وبانيل", name: "بانيل مربع 16 وات", price: 210, qty: 10, img: "panel-square.jpg" },
+        { cat: "لمبات", from: true, name: "لمبات فينوس وسبرينت ليد (من 45 إلى 276 جنيه حسب النوع)", price: 45, qty: 10, img: "lamps-venus.jpg" },
+        { cat: "مفاتيح وبريزات", name: "مفتاح سخان جي فينوس 20 أمبير", price: 149, qty: 10, img: "switch-heater.jpg" },
+        { cat: "مفاتيح وبريزات", name: "مفتاح تكييف باللمبة 45 أمبير", price: 444, qty: 10, img: "switch-ac.jpg" },
+        { cat: "مفاتيح وبريزات", name: "مفتاح ثلاثي عادي باللمبة 16 أمبير", price: 151, qty: 10, img: "switch-triple.jpg" },
+        { cat: "مفاتيح وبريزات", name: "مفتاح مروحة جي فينوس", price: 781, qty: 10, img: "switch-fan.jpg" },
+        { cat: "مفاتيح وبريزات", name: "بريزة شوكو بمفتاح وفصل ولمبة إشارة 16A", price: 260, qty: 10, img: "socket-choco.jpg" },
+        { cat: "مفاتيح وبريزات", name: "بريزة قوة سمارت واي فاي", price: 1060, qty: 10, img: "socket-smart.jpg" },
+        { cat: "مفاتيح وبريزات", name: "بريزة USB مجوز 2A", price: 788, qty: 10, img: "socket-usb.jpg" },
+        { cat: "مفاتيح وبريزات", name: "بريزة أرضي والأمان (بيج) 16A", price: 59, qty: 10, img: "socket-earth.jpg" },
+        { cat: "مفاتيح وبريزات", name: "بريزة إنترنت CAT6", price: 195, qty: 10, img: "socket-cat6.jpg" },
+        { cat: "مفاتيح وبريزات", from: true, name: "وشوش جي فينوس كلاسيك / جلاكسي / سكاي (من 28 إلى 72 جنيه حسب المقاس)", price: 28, qty: 10, img: "faceplates.jpg" },
+        { cat: "لمبات", name: "سبوت لايت مدور متحرك 6 وات", price: 140, qty: 10, img: "spotlight.jpg" },
+        { cat: "لمبات", name: "سبوت لايت مدور متحرك 9 وات", price: 165, qty: 10, img: "spotlight.jpg" },
+        { cat: "لمبات", name: "سبوت لايت مدور متحرك 20 وات", price: 390, qty: 10, img: "spotlight.jpg" },
+        { cat: "لمبات", name: "سبوت لايت مدور متحرك 30 وات", price: 550, qty: 10, img: "spotlight.jpg" },
+        { cat: "لمبات", name: "بانيل مدور 6 وات", price: 125, qty: 10, img: "panel-round.jpg" },
+        { cat: "لمبات", name: "بانيل مدور 9 وات", price: 145, qty: 10, img: "panel-round.jpg" },
+        { cat: "لمبات", name: "بانيل مدور 12 وات", price: 175, qty: 10, img: "panel-round.jpg" },
+        { cat: "لمبات", name: "بانيل مدور 18 وات", price: 225, qty: 10, img: "panel-round.jpg" },
+        { cat: "لمبات", name: "بانيل مدور 24 وات", price: 310, qty: 10, img: "panel-round.jpg" },
+        { cat: "لمبات", name: "بانيل مربع 16 وات", price: 210, qty: 10, img: "panel-square.jpg" },
         { cat: "لمبات", name: "لمبة إليوس ليد بلحة / شمعة 5 وات (أبيض مصنفر)", price: 59, qty: 10, img: "bulb-candle.jpg" },
         { cat: "لمبات", name: "لمبة إليوس MR16 كاس 3.5 وات (ليد أصفر دافئ)", price: 70, qty: 10, img: "bulb-mr16.jpg" },
         { cat: "لمبات", name: "لمبة إليوس ليد تيوب 120 سم (20 وات)", price: 158, qty: 10, img: "tube-120.jpg" },
@@ -104,48 +104,40 @@
     ];
 
     var cart = {};
-    var currentCat = "الكل";
+    var cat = "الكل";
     try { cart = JSON.parse(localStorage.getItem("suez_cart") || "{}"); } catch (e) { cart = {}; }
+    for (var k in cart) { if (!products[k]) delete cart[k]; }
 
     function $(id) { return document.getElementById(id); }
-    function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
-    function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
     function save() { try { localStorage.setItem("suez_cart", JSON.stringify(cart)); } catch (e) {} }
 
     function showCats() {
       var names = ["الكل"];
-      for (var i = 0; i < products.length; i++) {
-        if (names.indexOf(products[i].cat) < 0) names.push(products[i].cat);
-      }
-      var html = "";
-      for (var j = 0; j < names.length; j++) {
-        html += '<button class="' + (names[j] === currentCat ? "on" : "") + '" onclick="setCat(' + j + ')">' + names[j] + '</button>';
-      }
-      $("cats").innerHTML = html;
-      $("cats").names = names;
+      products.forEach(function (p) { if (names.indexOf(p.cat) < 0) names.push(p.cat); });
+      $("cats").innerHTML = names.map(function (n) {
+        return '<button class="' + (n === cat ? "on" : "") + '" onclick="setCat(\'' + n + '\')">' + n + '</button>';
+      }).join("");
     }
-
-    function setCat(j) { currentCat = $("cats").names[j]; showCats(); show(); }
+    function setCat(n) { cat = n; showCats(); show(); }
 
     function show() {
       var word = $("search").value.toLowerCase();
       var html = "";
       for (var i = 0; i < products.length; i++) {
         var p = products[i];
-        if ((currentCat === "الكل" || p.cat === currentCat) && p.name.toLowerCase().indexOf(word) >= 0) {
-          var pic = '<div class="pic">' + esc(p.name.charAt(0)) +
+        if ((cat === "الكل" || p.cat === cat) && p.name.toLowerCase().indexOf(word) >= 0) {
+          var pic = '<div class="pic">' + p.name.charAt(0) +
             (p.img ? '<img src="' + p.img + '" alt="" loading="lazy" onerror="this.remove()">' : '') +
             '</div>';
           var n = cart[i] || 0;
-          var ctrl;
-          if (p.qty <= 0) ctrl = "";
-          else if (n > 0) ctrl = '<div class="qty"><button onclick="chg(' + i + ',1)">+</button><span>' + n + '</span><button onclick="chg(' + i + ',-1)">−</button></div>';
-          else ctrl = '<button class="add" onclick="chg(' + i + ',1)">أضف للسلة</button>';
+          var ctrl = p.qty <= 0 ? ''
+            : n ? '<div class="qty"><button onclick="chg(' + i + ',1)">+</button><span>' + n + '</span><button onclick="chg(' + i + ',-1)">−</button></div>'
+                : '<button class="add" onclick="chg(' + i + ',1)">أضف للسلة</button>';
           html += '<div class="card">' + pic +
             '<div class="info">' +
-            '<div class="name">' + esc(p.name) + '</div>' +
-            '<div class="price">' + (p.from ? "يبدأ من " : "") + fmt(p.price) + ' جنيه</div>' +
-            '<div' + (p.qty > 0 ? '>متوفر: ' + p.qty : ' class="out">خلصان') + '</div>' +
+            '<div class="name">' + p.name + '</div>' +
+            '<div class="price">' + (p.from ? 'يبدأ من ' : '') + p.price + ' جنيه</div>' +
+            '<div' + (p.qty > 0 ? '>متوفر' : ' class="out">خلصان') + '</div>' +
             ctrl +
             '</div></div>';
         }
@@ -157,160 +149,57 @@
       var n = (cart[i] || 0) + d;
       if (n > products[i].qty) n = products[i].qty;
       if (n <= 0) delete cart[i]; else cart[i] = n;
-      save(); show(); showBar();
+      save(); show(); bar();
       if ($("sheet").style.display === "flex") showCart();
     }
 
     function totals() {
-      var count = 0, sum = 0;
-      for (var i in cart) { count += cart[i]; sum += cart[i] * products[i].price; }
-      return { count: count, sum: sum };
+      var c = 0, s = 0;
+      for (var i in cart) { c += cart[i]; s += cart[i] * products[i].price; }
+      return { count: c, sum: s };
     }
 
-    function showBar() {
+    function bar() {
       var t = totals();
       $("bar").style.display = t.count ? "flex" : "none";
-      $("barText").textContent = t.count + " منتج — " + fmt(t.sum) + " جنيه";
+      $("barText").textContent = t.count + " منتج — " + t.sum + " جنيه";
     }
 
     function showCart() {
-      var html = "";
-      for (var i in cart) {
+      var ids = Object.keys(cart);
+      $("items").innerHTML = ids.length ? ids.map(function (i) {
         var p = products[i];
-        html += '<div class="row"><div class="t">' + esc(p.name) + '<br><small>' + fmt(p.price) + ' × ' + cart[i] + '</small></div>' +
+        return '<div class="row"><div class="t">' + p.name + '<br><small>' + p.price + ' × ' + cart[i] + '</small></div>' +
           '<div class="qty"><button onclick="chg(' + i + ',1)">+</button><span>' + cart[i] + '</span><button onclick="chg(' + i + ',-1)">−</button></div></div>';
-      }
-      $("items").innerHTML = html || '<div class="empty">السلة فاضية</div>';
-      $("total").textContent = "الإجمالي: " + fmt(totals().sum) + " جنيه";
+      }).join("") : '<div class="empty">السلة فاضية</div>';
+      $("total").textContent = "الإجمالي: " + totals().sum + " جنيه";
     }
-
     function openCart() { showCart(); $("sheet").style.display = "flex"; }
     function closeCart() { $("sheet").style.display = "none"; }
 
     function sendOrder() {
-      var t = totals();
-      if (!t.count) { alert("السلة فاضية"); return; }
-      if (SHOP.whatsapp === "201000000000") { alert("غيّر رقم الواتساب في أول الكود (SHOP)"); return; }
+      var ids = Object.keys(cart);
+      if (!ids.length) { alert("السلة فاضية"); return; }
+      if (SHOP.whatsapp === "01092967350") { alert("غيّر رقم الواتساب في أول الكود (SHOP)"); return; }
       var msg = "طلب جديد من Suez Store\n\n";
-      for (var i in cart) {
+      ids.forEach(function (i) {
         var p = products[i];
-        msg += "• " + p.name + "\n   " + cart[i] + " × " + fmt(p.price) + " = " + fmt(cart[i] * p.price) + " جنيه\n";
-      }
-      msg += "\nالإجمالي: " + fmt(t.sum) + " جنيه";
-      var name = $("cname").value.trim(), ph = $("cphone").value.trim(), ad = $("caddr").value.trim();
-      if (name) msg += "\nالاسم: " + name;
+        msg += "• " + p.name + "\n   " + cart[i] + " × " + p.price + " = " + (cart[i] * p.price) + " جنيه\n";
+      });
+      msg += "\nالإجمالي: " + totals().sum + " جنيه";
+      var nm = $("cname").value.trim(), ph = $("cphone").value.trim(), ad = $("caddr").value.trim();
+      if (nm) msg += "\nالاسم: " + nm;
       if (ph) msg += "\nالموبايل: " + ph;
       if (ad) msg += "\nالعنوان: " + ad;
       window.location.href = "https://wa.me/" + SHOP.whatsapp + "?text=" + encodeURIComponent(msg);
     }
 
+    $("info").textContent = SHOP.address + " — " + SHOP.phone;
     $("search").addEventListener("input", show);
-    $("foot").textContent = SHOP.address + " — للاستفسار: " + SHOP.phone;
-    showCats(); show(); showBar();
+    showCats(); show(); bar();
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js");
     }
   </script>
 </body>
-</html>
-}
-
-    document.getElementById("search").addEventListener("input", show);
-    show();
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
-    }
-  </script>
-</body>
-</html><!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Suez Store</title><link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f6b53">
-  <style>
-    body { font-family: sans-serif; background: #f1f4f1; margin: 0; padding: 16px; }
-    h1 { color: #0f6b53; }
-    input { width: 100%; padding: 10px; font-size: 16px; margin-bottom: 12px; box-sizing: border-box; }
-    .card { display: flex; gap: 12px; align-items: center; background: white; border-radius: 10px; padding: 12px; margin-bottom: 12px; border: 1px solid #d9e0dc; }
-    .pic { position: relative; width: 88px; height: 88px; flex: none; border-radius: 8px; background: #e3ece8; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #0f6b53; font-size: 30px; font-weight: bold; }
-    .pic img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-    .info { min-width: 0; flex: 1; }
-    .name { overflow-wrap: anywhere; }
-    .price { font-size: 20px; font-weight: bold; }
-    .out { color: #a3302a; }
-  </style>
-</head>
-<body>
-  <h1>Suez Store</h1>
-  <input id="search" placeholder="دوّر على منتج">
-  <div id="list"></div>
-
-  <script>
-    // img = اسم ملف الصورة اللي هترفعها على GitHub جنب index.html
-    var products = [
-        { name: "لمبات فينوس وسبرينت ليد (من 45 إلى 276 جنيه حسب النوع)", price: 45, qty: 10, img: "lamps-venus.jpg" },
-        { name: "مفتاح سخان جي فينوس 20 أمبير", price: 149, qty: 10, img: "switch-heater.jpg" },
-        { name: "مفتاح تكييف باللمبة 45 أمبير", price: 444, qty: 10, img: "switch-ac.jpg" },
-        { name: "مفتاح ثلاثي عادي باللمبة 16 أمبير", price: 151, qty: 10, img: "switch-triple.jpg" },
-        { name: "مفتاح مروحة جي فينوس", price: 781, qty: 10, img: "switch-fan.jpg" },
-        { name: "بريزة شوكو بمفتاح وفصل ولمبة إشارة 16A", price: 260, qty: 10, img: "socket-choco.jpg" },
-        { name: "بريزة قوة سمارت واي فاي", price: 1060, qty: 10, img: "socket-smart.jpg" },
-        { name: "بريزة USB مجوز 2A", price: 788, qty: 10, img: "socket-usb.jpg" },
-        { name: "بريزة أرضي والأمان (بيج) 16A", price: 59, qty: 10, img: "socket-earth.jpg" },
-        { name: "بريزة إنترنت CAT6", price: 195, qty: 10, img: "socket-cat6.jpg" },
-        { name: "وشوش جي فينوس كلاسيك / جلاكسي / سكاي (من 28 إلى 72 جنيه حسب المقاس)", price: 28, qty: 10, img: "faceplates.jpg" },
-        { name: "سبوت لايت مدور متحرك 6 وات", price: 140, qty: 10, img: "spotlight.jpg" },
-        { name: "سبوت لايت مدور متحرك 9 وات", price: 165, qty: 10, img: "spotlight.jpg" },
-        { name: "سبوت لايت مدور متحرك 20 وات", price: 390, qty: 10, img: "spotlight.jpg" },
-        { name: "سبوت لايت مدور متحرك 30 وات", price: 550, qty: 10, img: "spotlight.jpg" },
-        { name: "بانيل مدور 6 وات", price: 125, qty: 10, img: "panel-round.jpg" },
-        { name: "بانيل مدور 9 وات", price: 145, qty: 10, img: "panel-round.jpg" },
-        { name: "بانيل مدور 12 وات", price: 175, qty: 10, img: "panel-round.jpg" },
-        { name: "بانيل مدور 18 وات", price: 225, qty: 10, img: "panel-round.jpg" },
-        { name: "بانيل مدور 24 وات", price: 310, qty: 10, img: "panel-round.jpg" },
-        { name: "بانيل مربع 16 وات", price: 210, qty: 10, img: "panel-square.jpg" },
-        { name: "لمبة إليوس ليد بلحة / شمعة 5 وات (أبيض مصنفر)", price: 59, qty: 10, img: "bulb-candle.jpg" },
-        { name: "لمبة إليوس MR16 كاس 3.5 وات (ليد أصفر دافئ)", price: 70, qty: 10, img: "bulb-mr16.jpg" },
-        { name: "لمبة إليوس ليد تيوب 120 سم (20 وات)", price: 158, qty: 10, img: "tube-120.jpg" },
-        { name: "لمبة إليوس ليد 12 وات (عبوة متعددة)", price: 400, qty: 10, img: "bulb-12w.jpg" },
-        { name: "إنرجايزر قلم (AA) قلوي - كارت 2 حجر", price: 85, qty: 10, img: "bat-aa.jpg" },
-        { name: "إنرجايزر ريموت (AAA) قلوي - كارت 2 حجر", price: 85, qty: 10, img: "bat-aaa.jpg" },
-        { name: "إنرجايزر ماكس برومو (AA) - عبوة 6 حجارة", price: 220, qty: 10, img: "bat-aa.jpg" },
-        { name: "إنرجايزر طورش (D) قلوي ماكس - كارت 2 حجر", price: 293, qty: 10, img: "bat-d.jpg" },
-        { name: "إنرجايزر مربع (9V) قلوي", price: 250, qty: 10, img: "bat-9v.jpg" },
-        { name: "إنرجايزر عملة (CR2032) ليثيوم 3 فولت", price: 75, qty: 10, img: "bat-cr2032.jpg" },
-        { name: "إنرجايزر شحن قلم (AA) 2300mAh - كارت 2 حجر", price: 450, qty: 10, img: "bat-rechargeable.jpg" },
-        { name: "إنرجايزر شحن ريموت (AAA) 800mAh - كارت 2 حجر", price: 450, qty: 10, img: "bat-rechargeable.jpg" },
-        { name: "شاحن ماكسي + 4 حجارة (AA) 2000mAh", price: 1033, qty: 10, img: "charger-maxi.jpg" }
-    ];
-
-    function show() {
-      var word = document.getElementById("search").value.toLowerCase();
-      var html = "";
-      for (var i = 0; i < products.length; i++) {
-        var p = products[i];
-        if (p.name.toLowerCase().indexOf(word) >= 0) {
-          var pic = '<div class="pic">' + p.name.charAt(0) +
-            (p.img ? '<img src="' + p.img + '" alt="" loading="lazy" onerror="this.remove()">' : '') +
-            '</div>';
-          html += '<div class="card">' + pic +
-            '<div class="info">' +
-            '<div class="name">' + p.name + '</div>' +
-            '<div class="price">' + p.price + ' جنيه</div>' +
-            '<div' + (p.qty > 0 ? '>متوفر: ' + p.qty : ' class="out">خلصان') + '</div>' +
-            '</div></div>';
-        }
-      }
-      document.getElementById("list").innerHTML = html;
-    }
-
-    document.getElementById("search").addEventListener("input", show);
-    show();
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("sw.js");
-    }
-  </script>
-</body>
-</html>
+  </html>
