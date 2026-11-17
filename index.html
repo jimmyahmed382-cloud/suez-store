@@ -5,85 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Suez Store</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f6b53">
+  <meta name="theme-color" content="#0b4a3b">
   <style>
-    body { font-family: sans-serif; background: #f1f4f1; margin: 0; padding: 16px 16px 90px; }
-    h1 { color: #0f6b53; }
+    body { font-family: sans-serif; background: linear-gradient(160deg, #0b4a3b 0%, #062f27 70%, #031c17 100%) fixed; min-height: 100vh; box-sizing: border-box; margin: 0; padding: 16px 16px 90px; }
+    h1 { color: #FCC24E; text-shadow: 0 2px 12px rgba(0,0,0,.3); }
     input { width: 100%; padding: 10px; font-size: 16px; margin-bottom: 12px; box-sizing: border-box; }
     #cats { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; }
-    .chip { flex: none; border: 1.5px solid #0f6b53; background: white; color: #0f6b53; border-radius: 30px; padding: 10px 18px; font-size: 16px; }
-    .chip.on { background: #0f6b53; color: white; }
-    .card { display: flex; gap: 12px; align-items: center; background: white; border-radius: 10px; padding: 12px; margin-bottom: 12px; border: 1px solid #d9e0dc; }
-    .pic { position: relative; width: 88px; height: 88px; flex: none; border-radius: 8px; background: #e3ece8; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #0f6b53; font-size: 30px; font-weight: bold; }
+    .chip { flex: none; border: 1.5px solid #FCC24E; background: rgba(255,255,255,.95); color: #0b4a3b; border-radius: 30px; padding: 10px 18px; font-size: 16px; }
+    .chip.on { background: #FCC24E; color: #0b4a3b; font-weight: bold; }
+    .card { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,.96); border-radius: 10px; padding: 8px; margin-bottom: 10px; border: 1.5px solid #FCC24E; box-shadow: 0 4px 14px rgba(252,194,78,.25); }
+    .pic { position: relative; width: 64px; height: 64px; flex: none; border-radius: 8px; background: #0b4a3b; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #FCC24E; font-size: 22px; font-weight: bold; }
     .pic img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
     .info { min-width: 0; flex: 1; }
     .name { overflow-wrap: anywhere; }
-    .price { font-size: 20px; font-weight: bold; margin: 4px 0; }
-    .qty { color: #6b7570; font-size: 14px; margin-bottom: 8px; }
+    .price { font-size: 17px; font-weight: bold; margin: 2px 0; color: #0b4a3b; }
+    .qty { color: #6b7570; font-size: 13px; margin-bottom: 4px; }
     .out { color: #a3302a; }
-    .add { background: #0f6b53; color: white; border: 0; border-radius: 8px; padding: 10px 16px; font-size: 16px; }
-    .add:disabled { background: #b9c3be; }
+    .add { background: #FCC24E; color: #0b4a3b; font-weight: bold; border: 0; border-radius: 8px; padding: 7px 12px; font-size: 14px; }
+    .add:disabled { background: #b9c3be; color: white; }
     .step { display: inline-flex; align-items: center; gap: 4px; }
-    .step button { width: 40px; height: 40px; border: 1.5px solid #0f6b53; background: white; color: #0f6b53; border-radius: 8px; font-size: 22px; }
-    .step b { min-width: 34px; text-align: center; font-size: 18px; }
-    #bar { position: fixed; left: 12px; right: 12px; bottom: 12px; background: #0f6b53; color: white; border: 0; border-radius: 12px; padding: 16px; font-size: 18px; display: flex; justify-content: space-between; z-index: 5; }
-    #panel { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f1f4f1; z-index: 10; overflow-y: auto; padding: 16px; }
+    .step button { width: 34px; height: 34px; border: 1.5px solid #FCC24E; background: #FCC24E; color: #0b4a3b; border-radius: 8px; font-size: 22px; }
+    .step b { min-width: 30px; text-align: center; font-size: 18px; color: #0b4a3b; }
+    #bar { position: fixed; left: 12px; right: 12px; bottom: 12px; background: #FCC24E; color: #0b4a3b; font-weight: bold; border: 0; border-radius: 12px; padding: 16px; font-size: 18px; display: flex; justify-content: space-between; z-index: 5; }
+    #panel { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f7f5ef; z-index: 10; overflow-y: auto; padding: 16px; }
     #panel[hidden], #bar[hidden] { display: none; }
-    .row { background: white; border: 1px solid #d9e0dc; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
-    .total { font-size: 22px; font-weight: bold; margin: 16px 0; }
-    .big { display: block; width: 100%; box-sizing: border-box; text-align: center; text-decoration: none; background: #0f6b53; color: white; border: 0; border-radius: 10px; padding: 14px; font-size: 18px; margin-bottom: 10px; }
-    .big.alt { background: white; color: #0f6b53; border: 1.5px solid #0f6b53; }
+    .row { background: white; border: 1.5px solid #FCC24E; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .total { font-size: 22px; font-weight: bold; margin: 16px 0; color: #0b4a3b; }
+    .big { display: block; width: 100%; box-sizing: border-box; text-align: center; text-decoration: none; background: #FCC24E; color: #0b4a3b; font-weight: bold; border: 0; border-radius: 10px; padding: 14px; font-size: 18px; margin-bottom: 10px; }
+    .big.alt { background: #fff7e0; color: #0b4a3b; border: 1.5px solid #FCC24E; }
     .x { background: none; border: 0; color: #a3302a; font-size: 15px; padding: 8px 0; }
+    #scanBtn { margin-bottom: 12px; }
+    #scanner { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 20; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; }
+    #scanner[hidden] { display: none; }
+    #reader { width: 100%; background: #000; }
+    #scanMsg { color: white; font-size: 18px; text-align: center; min-height: 26px; }
+    #splash { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: linear-gradient(160deg, #0b4a3b 0%, #062f27 70%, #031c17 100%); animation: spOut .8s ease-in 1.5s forwards; pointer-events: none; }
+    .sp-logo { font-size: 64px; animation: pop .8s ease-out both; }
+    .sp-name { color: #FCC24E; font-size: 30px; font-weight: bold; text-shadow: 0 2px 12px rgba(0,0,0,.3); animation: rise .8s ease-out .2s both; }
+    @keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes rise { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes spOut { to { opacity: 0; transform: scale(1.7); visibility: hidden; } }
+    .list-wrap { display: block; }
+    .card { gap: 8px; padding: 6px 8px; margin-bottom: 6px; border-radius: 8px; }
+    .pic { width: 46px; height: 46px; font-size: 17px; border-radius: 6px; }
+    .info { min-width: 0; flex: 1; }
+    .name { font-size: 14px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .line { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-top: 2px; }
+    .price { font-size: 15px; margin: 0; }
+    .qty { font-size: 12px; margin: 0; }
+    .act { flex: none; }
+    .add { padding: 6px 10px; font-size: 13px; }
+    .step { gap: 3px; }
+    .step button { width: 28px; height: 28px; font-size: 18px; border-radius: 6px; }
+    .step b { min-width: 22px; font-size: 14px; }
+    .sbox { display: flex; align-items: center; gap: 6px; width: max-content; max-width: 100%; background: rgba(255,255,255,.95); border: 1.5px solid #FCC24E; border-radius: 20px; padding: 4px 12px; margin-bottom: 12px; box-sizing: border-box; }
+    .sbox span { font-size: 14px; }
+    .sbox input { width: 160px; border: 0; padding: 4px 0; margin: 0; font-size: 14px; background: transparent; }
+    .sbox input:focus { border: 0; outline: none; }
+    #scanBtn { width: max-content; max-width: 100%; padding: 6px 14px; border-radius: 20px; font-size: 14px; background: rgba(255,255,255,.95); color: #0b4a3b; border: 1.5px solid #FCC24E; box-shadow: none; margin-bottom: 12px; }
   </style>
 </head>
 <body>
+  <div id="splash"><div class="sp-logo">⚡</div><div class="sp-name">Suez Store</div></div>
   <h1>Suez Store</h1>
-  <input id="search" placeholder="دوّر على منتج">
+  <div class="sbox"><span>🔍</span><input id="search" placeholder="دوّر على منتج"></div>
+  <button id="scanBtn" class="big">📷 امسح الباركود</button>
   <div id="cats"></div>
   <div id="list"></div>
+
+  <div id="scanner" hidden>
+    <div id="reader"></div>
+    <div id="scanMsg"></div>
+    <button id="scanClose" class="big alt">قفل الكاميرا</button>
+  </div>
 
   <button id="bar" hidden></button>
   <div id="panel" hidden></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
   <script>
     // img = اسم ملف الصورة اللي هترفعها على GitHub جنب index.html
     // cat = القسم (لمبات / مفاتيح / بريزات / بطاريات)
     // qty = الكمية المتاحة
     var products = [
-        { name: "لمبات فينوس وسبرينت ليد (من 45 إلى 276 جنيه حسب النوع)", price: 45, qty: 10, cat: "لمبات", img: "lamps-venus.jpg", from: true },
-        { name: "مفتاح سخان جي فينوس 20 أمبير", price: 149, qty: 10, cat: "مفاتيح", img: "switch-heater.jpg" },
-        { name: "مفتاح تكييف باللمبة 45 أمبير", price: 444, qty: 10, cat: "مفاتيح", img: "switch-ac.jpg" },
-        { name: "مفتاح ثلاثي عادي باللمبة 16 أمبير", price: 151, qty: 10, cat: "مفاتيح", img: "switch-triple.jpg" },
-        { name: "مفتاح مروحة جي فينوس", price: 781, qty: 10, cat: "مفاتيح", img: "switch-fan.jpg" },
-        { name: "بريزة شوكو بمفتاح وفصل ولمبة إشارة 16A", price: 260, qty: 10, cat: "بريزات", img: "socket-choco.jpg" },
-        { name: "بريزة قوة سمارت واي فاي", price: 1060, qty: 10, cat: "بريزات", img: "socket-smart.jpg" },
-        { name: "بريزة USB مجوز 2A", price: 788, qty: 10, cat: "بريزات", img: "socket-usb.jpg" },
-        { name: "بريزة أرضي والأمان (بيج) 16A", price: 59, qty: 10, cat: "بريزات", img: "socket-earth.jpg" },
-        { name: "بريزة إنترنت CAT6", price: 195, qty: 10, cat: "بريزات", img: "socket-cat6.jpg" },
-        { name: "وشوش جي فينوس كلاسيك / جلاكسي / سكاي (من 28 إلى 72 جنيه حسب المقاس)", price: 28, qty: 10, cat: "بريزات", img: "faceplates.jpg", from: true },
-        { name: "سبوت لايت مدور متحرك 6 وات", price: 140, qty: 10, cat: "لمبات", img: "spotlight.jpg" },
-        { name: "سبوت لايت مدور متحرك 9 وات", price: 165, qty: 10, cat: "لمبات", img: "spotlight.jpg" },
-        { name: "سبوت لايت مدور متحرك 20 وات", price: 390, qty: 10, cat: "لمبات", img: "spotlight.jpg" },
-        { name: "سبوت لايت مدور متحرك 30 وات", price: 550, qty: 10, cat: "لمبات", img: "spotlight.jpg" },
-        { name: "بانيل مدور 6 وات", price: 125, qty: 10, cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مدور 9 وات", price: 145, qty: 10, cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مدور 12 وات", price: 175, qty: 10, cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مدور 18 وات", price: 225, qty: 10, cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مدور 24 وات", price: 310, qty: 10, cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مربع 16 وات", price: 210, qty: 10, cat: "لمبات", img: "panel-square.jpg" },
-        { name: "لمبة إليوس ليد بلحة / شمعة 5 وات (أبيض مصنفر)", price: 59, qty: 10, cat: "لمبات", img: "bulb-candle.jpg" },
-        { name: "لمبة إليوس MR16 كاس 3.5 وات (ليد أصفر دافئ)", price: 70, qty: 10, cat: "لمبات", img: "bulb-mr16.jpg" },
-        { name: "لمبة إليوس ليد تيوب 120 سم (20 وات)", price: 158, qty: 10, cat: "لمبات", img: "tube-120.jpg" },
-        { name: "لمبة إليوس ليد 12 وات (عبوة متعددة)", price: 400, qty: 10, cat: "لمبات", img: "bulb-12w.jpg" },
-        { name: "إنرجايزر قلم (AA) قلوي - كارت 2 حجر", price: 85, qty: 10, cat: "بطاريات", img: "bat-aa.jpg" },
-        { name: "إنرجايزر ريموت (AAA) قلوي - كارت 2 حجر", price: 85, qty: 10, cat: "بطاريات", img: "bat-aaa.jpg" },
-        { name: "إنرجايزر ماكس برومو (AA) - عبوة 6 حجارة", price: 220, qty: 10, cat: "بطاريات", img: "bat-aa.jpg" },
-        { name: "إنرجايزر طورش (D) قلوي ماكس - كارت 2 حجر", price: 293, qty: 10, cat: "بطاريات", img: "bat-d.jpg" },
-        { name: "إنرجايزر مربع (9V) قلوي", price: 250, qty: 10, cat: "بطاريات", img: "bat-9v.jpg" },
-        { name: "إنرجايزر عملة (CR2032) ليثيوم 3 فولت", price: 75, qty: 10, cat: "بطاريات", img: "bat-cr2032.jpg" },
-        { name: "إنرجايزر شحن قلم (AA) 2300mAh - كارت 2 حجر", price: 450, qty: 10, cat: "بطاريات", img: "bat-rechargeable.jpg" },
-        { name: "إنرجايزر شحن ريموت (AAA) 800mAh - كارت 2 حجر", price: 450, qty: 10, cat: "بطاريات", img: "bat-rechargeable.jpg" },
-        { name: "شاحن ماكسي + 4 حجارة (AA) 2000mAh", price: 1033, qty: 10, cat: "بطاريات", img: "charger-maxi.jpg" }
+        { name: "لمبات فينوس وسبرينت ليد (من 45 إلى 276 جنيه حسب النوع)", price: 45, qty: 10, code: "", cat: "لمبات", img: "lamps-venus.jpg", from: true },
+        { name: "مفتاح سخان جي فينوس 20 أمبير", price: 149, qty: 10, code: "", cat: "مفاتيح", img: "switch-heater.jpg" },
+        { name: "مفتاح تكييف باللمبة 45 أمبير", price: 444, qty: 10, code: "", cat: "مفاتيح", img: "switch-ac.jpg" },
+        { name: "مفتاح ثلاثي عادي باللمبة 16 أمبير", price: 151, qty: 10, code: "", cat: "مفاتيح", img: "switch-triple.jpg" },
+        { name: "مفتاح مروحة جي فينوس", price: 781, qty: 10, code: "", cat: "مفاتيح", img: "switch-fan.jpg" },
+        { name: "بريزة شوكو بمفتاح وفصل ولمبة إشارة 16A", price: 260, qty: 10, code: "", cat: "بريزات", img: "socket-choco.jpg" },
+        { name: "بريزة قوة سمارت واي فاي", price: 1060, qty: 10, code: "", cat: "بريزات", img: "socket-smart.jpg" },
+        { name: "بريزة USB مجوز 2A", price: 788, qty: 10, code: "", cat: "بريزات", img: "socket-usb.jpg" },
+        { name: "بريزة أرضي والأمان (بيج) 16A", price: 59, qty: 10, code: "", cat: "بريزات", img: "socket-earth.jpg" },
+        { name: "بريزة إنترنت CAT6", price: 195, qty: 10, code: "", cat: "بريزات", img: "socket-cat6.jpg" },
+        { name: "وشوش جي فينوس كلاسيك / جلاكسي / سكاي (من 28 إلى 72 جنيه حسب المقاس)", price: 28, qty: 10, code: "", cat: "بريزات", img: "faceplates.jpg", from: true },
+        { name: "سبوت لايت مدور متحرك 6 وات", price: 140, qty: 10, code: "", cat: "لمبات", img: "spotlight.jpg" },
+        { name: "سبوت لايت مدور متحرك 9 وات", price: 165, qty: 10, code: "", cat: "لمبات", img: "spotlight.jpg" },
+        { name: "سبوت لايت مدور متحرك 20 وات", price: 390, qty: 10, code: "", cat: "لمبات", img: "spotlight.jpg" },
+        { name: "سبوت لايت مدور متحرك 30 وات", price: 550, qty: 10, code: "", cat: "لمبات", img: "spotlight.jpg" },
+        { name: "بانيل مدور 6 وات", price: 125, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
+        { name: "بانيل مدور 9 وات", price: 145, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
+        { name: "بانيل مدور 12 وات", price: 175, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
+        { name: "بانيل مدور 18 وات", price: 225, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
+        { name: "بانيل مدور 24 وات", price: 310, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
+        { name: "بانيل مربع 16 وات", price: 210, qty: 10, code: "", cat: "لمبات", img: "panel-square.jpg" },
+        { name: "لمبة إليوس ليد بلحة / شمعة 5 وات (أبيض مصنفر)", price: 59, qty: 10, code: "", cat: "لمبات", img: "bulb-candle.jpg" },
+        { name: "لمبة إليوس MR16 كاس 3.5 وات (ليد أصفر دافئ)", price: 70, qty: 10, code: "", cat: "لمبات", img: "bulb-mr16.jpg" },
+        { name: "لمبة إليوس ليد تيوب 120 سم (20 وات)", price: 158, qty: 10, code: "", cat: "لمبات", img: "tube-120.jpg" },
+        { name: "لمبة إليوس ليد 12 وات (عبوة متعددة)", price: 400, qty: 10, code: "", cat: "لمبات", img: "bulb-12w.jpg" },
+        { name: "إنرجايزر قلم (AA) قلوي - كارت 2 حجر", price: 85, qty: 10, code: "", cat: "بطاريات", img: "bat-aa.jpg" },
+        { name: "إنرجايزر ريموت (AAA) قلوي - كارت 2 حجر", price: 85, qty: 10, code: "", cat: "بطاريات", img: "bat-aaa.jpg" },
+        { name: "إنرجايزر ماكس برومو (AA) - عبوة 6 حجارة", price: 220, qty: 10, code: "", cat: "بطاريات", img: "bat-aa.jpg" },
+        { name: "إنرجايزر طورش (D) قلوي ماكس - كارت 2 حجر", price: 293, qty: 10, code: "", cat: "بطاريات", img: "bat-d.jpg" },
+        { name: "إنرجايزر مربع (9V) قلوي", price: 250, qty: 10, code: "", cat: "بطاريات", img: "bat-9v.jpg" },
+        { name: "إنرجايزر عملة (CR2032) ليثيوم 3 فولت", price: 75, qty: 10, code: "", cat: "بطاريات", img: "bat-cr2032.jpg" },
+        { name: "إنرجايزر شحن قلم (AA) 2300mAh - كارت 2 حجر", price: 450, qty: 10, code: "", cat: "بطاريات", img: "bat-rechargeable.jpg" },
+        { name: "إنرجايزر شحن ريموت (AAA) 800mAh - كارت 2 حجر", price: 450, qty: 10, code: "", cat: "بطاريات", img: "bat-rechargeable.jpg" },
+        { name: "شاحن ماكسي + 4 حجارة (AA) 2000mAh", price: 1033, qty: 10, code: "", cat: "بطاريات", img: "charger-maxi.jpg" }
     ];
 
     var CATS = ["الكل", "لمبات", "مفاتيح", "بريزات", "بطاريات"];
@@ -136,9 +174,9 @@
           (p.img ? '<img src="' + p.img + '" alt="" loading="lazy" onerror="this.remove()">' : '') + '</div>';
         html += '<div class="card">' + pic + '<div class="info">' +
           '<div class="name">' + p.name + '</div>' +
-          '<div class="price">' + (p.from ? 'يبدأ من ' : '') + p.price + ' جنيه</div>' +
-          '<div class="qty' + (p.qty > 0 ? '' : ' out') + '">' + (p.qty > 0 ? 'متوفر: ' + p.qty : 'خلصان') + '</div>' +
-          stepper(p) + '</div></div>';
+          '<div class="line"><span class="price">' + (p.from ? 'يبدأ من ' : '') + p.price + ' جنيه</span>' +
+          '<span class="qty' + (p.qty > 0 ? '' : ' out') + '">' + (p.qty > 0 ? 'متوفر: ' + p.qty : 'خلصان') + '</span></div>' +
+          '</div><div class="act">' + stepper(p) + '</div></div>';
       }
       document.getElementById("list").innerHTML = html || '<p>مفيش نتائج</p>';
     }
@@ -162,7 +200,7 @@
       var s = cartInfo();
       if (s.n === 0) { panel.hidden = true; return; }
       var h = '<h1>🛒 السلة</h1>';
-      var msg = "طلب جديد من Suez Store:%0A";
+      var msg = "";
       for (var name in cart) {
         var p = find(name), n = cart[name], k = esc(name);
         h += '<div class="row"><div class="name">' + p.name + '</div>' +
@@ -170,14 +208,44 @@
           '<span class="step"><button data-act="plus" data-name="' + k + '">+</button><b>' + n +
           '</b><button data-act="minus" data-name="' + k + '">−</button></span> ' +
           '<button class="x" data-act="del" data-name="' + k + '">حذف</button></div>';
-        msg += "- " + encodeURIComponent(name + " × " + n + " = " + (n * p.price) + " جنيه") + "%0A";
+        msg += encodeURIComponent(name + " - " + n + " ب " + (n * p.price) + " جنيه") + "%0A";
       }
-      msg += encodeURIComponent("الإجمالي: " + s.total + " جنيه");
+      if (Object.keys(cart).length > 1) msg += encodeURIComponent("الإجمالي: " + s.total + " جنيه");
       h += '<div class="total">الإجمالي: ' + s.total + ' جنيه</div>' +
         '<a class="big" href="https://wa.me/201092967350?text=' + msg + '">ابعت الطلب واتساب</a>' +
         '<button class="big alt" data-act="clear">فضّي السلة</button>' +
         '<button class="big alt" data-act="close">كمّل تسوق</button>';
       panel.innerHTML = h;
+    }
+
+    var scanner = null, lastCode = "", lastTime = 0;
+    function scanMsg(t) { document.getElementById("scanMsg").textContent = t; }
+
+    function openScan() {
+      document.getElementById("scanner").hidden = false;
+      if (typeof Html5Qrcode === "undefined") { scanMsg("ما قدرتش أحمّل الماسح، اتأكد إن النت شغال"); return; }
+      scanMsg("وجّه الكاميرا على الباركود");
+      scanner = new Html5Qrcode("reader");
+      scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 260, height: 160 } }, onScan, function () {})
+        .catch(function () { scanMsg("ما قدرتش أفتح الكاميرا. اسمح بالكاميرا من إعدادات الموبايل"); });
+    }
+
+    function closeScan() {
+      document.getElementById("scanner").hidden = true;
+      var s = scanner; scanner = null;
+      if (s) { s.stop().then(function () { s.clear(); }).catch(function () {}); }
+    }
+
+    function onScan(text) {
+      var now = Date.now();
+      if (text === lastCode && now - lastTime < 2000) return;
+      lastCode = text; lastTime = now;
+      var found = null;
+      for (var i = 0; i < products.length; i++) if (products[i].code && products[i].code === text) found = products[i];
+      if (!found) { scanMsg("الباركود ده مش موجود في الأصناف: " + text); return; }
+      if (found.qty <= 0 || (cart[found.name] || 0) >= found.qty) { scanMsg("الكمية خلصت: " + found.name); return; }
+      change(found.name, 1);
+      scanMsg("✔ اتضاف: " + found.name);
     }
 
     function render() { show(); showBar(); showPanel(); }
@@ -187,6 +255,8 @@
       if (t.id === "bar" || (t.parentNode && t.parentNode.id === "bar")) {
         document.getElementById("panel").hidden = false; render(); return;
       }
+      if (t.id === "scanBtn") { openScan(); return; }
+      if (t.id === "scanClose") { closeScan(); return; }
       var c = t.getAttribute("data-cat");
       if (c) { current = c; showCats(); show(); return; }
       var act = t.getAttribute("data-act"), name = t.getAttribute("data-name");
@@ -200,6 +270,7 @@
     document.getElementById("search").addEventListener("input", show);
     showCats();
     render();
+    setTimeout(function () { var sp = document.getElementById("splash"); if (sp) sp.remove(); }, 2400);
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("sw.js");
     }
