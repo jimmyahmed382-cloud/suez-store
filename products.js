@@ -53,3 +53,4 @@ const products = [
     { name: "بريزة إنترنت CAT6", price: 195, qty: 15 },
     { name: "وشوش جي فينوس (كلاسيك / جلاكسي / سكاي)", price: 50, qty: 50 }
 ];
+{ name: "بريزة فينوس", price: 25, qty: 10, code: "", cat: "بريزات", img: "" },
