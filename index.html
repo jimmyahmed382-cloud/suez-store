@@ -63,13 +63,21 @@
     .sbox input { width: 160px; border: 0; padding: 4px 0; margin: 0; font-size: 14px; background: transparent; }
     .sbox input:focus { border: 0; outline: none; }
     #scanBtn { width: max-content; max-width: 100%; padding: 6px 14px; border-radius: 20px; font-size: 14px; background: rgba(255,255,255,.95); color: #0b4a3b; border: 1.5px solid #FCC24E; box-shadow: none; margin-bottom: 12px; }
+    .gsearch { display: inline-block; font-size: 12px; color: #3b1f6e; background: #FFF3D1; border: 1px solid #FCC24E; border-radius: 12px; padding: 2px 8px; text-decoration: none; margin: 2px 0; }
+    .toprow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .toprow .sbox { margin-bottom: 0; width: 150px; flex: none; }
+    .social { display: flex; gap: 6px; }
+    .social a { background: #3b1f6e; color: #FCC24E; font-size: 13px; font-weight: bold; text-decoration: none; padding: 6px 8px; border-radius: 20px; white-space: nowrap; }
+    .actrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .actrow #scanBtn { margin-bottom: 0; }
+    .social { display: flex; gap: 5px; flex-wrap: wrap; }
   </style>
 </head>
 <body>
   <div id="splash"><div class="sp-logo">⚡</div><div class="sp-name">Suez Store</div></div>
   <h1>Suez Store</h1>
-  <div class="sbox"><span>🔍</span><input id="search" placeholder="دوّر على منتج"></div>
-  <button id="scanBtn" class="big">📷 امسح الباركود</button>
+  <div class="toprow"><div class="sbox"><span>🔍</span><input id="search" placeholder="دوّر على منتج"></div></div>
+  <div class="actrow"><button id="scanBtn" class="big">📷 امسح الباركود</button><div class="social"><a href="https://www.tiktok.com/@a7medjimmy6" target="_blank" rel="noopener">TikTok</a><a href="https://www.facebook.com/share/1AdfLcGPJv/" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/jimmy544389" target="_blank" rel="noopener">Instagram</a></div></div>
   <div id="cats"></div>
   <div id="list"></div>
 
@@ -83,46 +91,8 @@
   <div id="panel" hidden></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <script src="products.js"></script>
   <script>
-    // img = اسم ملف الصورة اللي هترفعها على GitHub جنب index.html
-    // cat = القسم (لمبات / مفاتيح / بريزات / بطاريات)
-    // qty = الكمية المتاحة
-    var products = [
-        { name: "لمبات فينوس وسبرينت ليد (من 45 إلى 276 جنيه حسب النوع)", price: 45, qty: 10, code: "", cat: "لمبات", img: "lamps-venus.jpg", from: true },
-        { name: "مفتاح سخان جي فينوس 20 أمبير", price: 149, qty: 10, code: "", cat: "مفاتيح", img: "switch-heater.jpg" },
-        { name: "مفتاح تكييف باللمبة 45 أمبير", price: 444, qty: 10, code: "", cat: "مفاتيح", img: "switch-ac.jpg" },
-        { name: "مفتاح ثلاثي عادي باللمبة 16 أمبير", price: 151, qty: 10, code: "", cat: "مفاتيح", img: "switch-triple.jpg" },
-        { name: "مفتاح مروحة جي فينوس", price: 781, qty: 10, code: "", cat: "مفاتيح", img: "switch-fan.jpg" },
-        { name: "بريزة شوكو بمفتاح وفصل ولمبة إشارة 16A", price: 260, qty: 10, code: "", cat: "بريزات", img: "socket-choco.jpg" },
-        { name: "بريزة قوة سمارت واي فاي", price: 1060, qty: 10, code: "", cat: "بريزات", img: "socket-smart.jpg" },
-        { name: "بريزة USB مجوز 2A", price: 788, qty: 10, code: "", cat: "بريزات", img: "socket-usb.jpg" },
-        { name: "بريزة أرضي والأمان (بيج) 16A", price: 59, qty: 10, code: "", cat: "بريزات", img: "socket-earth.jpg" },
-        { name: "بريزة إنترنت CAT6", price: 195, qty: 10, code: "", cat: "بريزات", img: "socket-cat6.jpg" },
-        { name: "وشوش جي فينوس كلاسيك / جلاكسي / سكاي (من 28 إلى 72 جنيه حسب المقاس)", price: 28, qty: 10, code: "", cat: "بريزات", img: "faceplates.jpg", from: true },
-        { name: "سبوت لايت مدور متحرك 6 وات", price: 140, qty: 10, code: "", cat: "لمبات", img: "spotlight.jpg" },
-        { name: "سبوت لايت مدور متحرك 9 وات", price: 165, qty: 10, code: "", cat: "لمبات", img: "spotlight.jpg" },
-        { name: "سبوت لايت مدور متحرك 20 وات", price: 390, qty: 10, code: "", cat: "لمبات", img: "spotlight.jpg" },
-        { name: "سبوت لايت مدور متحرك 30 وات", price: 550, qty: 10, code: "", cat: "لمبات", img: "spotlight.jpg" },
-        { name: "بانيل مدور 6 وات", price: 125, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مدور 9 وات", price: 145, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مدور 12 وات", price: 175, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مدور 18 وات", price: 225, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مدور 24 وات", price: 310, qty: 10, code: "", cat: "لمبات", img: "panel-round.jpg" },
-        { name: "بانيل مربع 16 وات", price: 210, qty: 10, code: "", cat: "لمبات", img: "panel-square.jpg" },
-        { name: "لمبة إليوس ليد بلحة / شمعة 5 وات (أبيض مصنفر)", price: 59, qty: 10, code: "", cat: "لمبات", img: "bulb-candle.jpg" },
-        { name: "لمبة إليوس MR16 كاس 3.5 وات (ليد أصفر دافئ)", price: 70, qty: 10, code: "", cat: "لمبات", img: "bulb-mr16.jpg" },
-        { name: "لمبة إليوس ليد تيوب 120 سم (20 وات)", price: 158, qty: 10, code: "", cat: "لمبات", img: "tube-120.jpg" },
-        { name: "لمبة إليوس ليد 12 وات (عبوة متعددة)", price: 400, qty: 10, code: "", cat: "لمبات", img: "bulb-12w.jpg" },
-        { name: "إنرجايزر قلم (AA) قلوي - كارت 2 حجر", price: 85, qty: 10, code: "", cat: "بطاريات", img: "bat-aa.jpg" },
-        { name: "إنرجايزر ريموت (AAA) قلوي - كارت 2 حجر", price: 85, qty: 10, code: "", cat: "بطاريات", img: "bat-aaa.jpg" },
-        { name: "إنرجايزر ماكس برومو (AA) - عبوة 6 حجارة", price: 220, qty: 10, code: "", cat: "بطاريات", img: "bat-aa.jpg" },
-        { name: "إنرجايزر طورش (D) قلوي ماكس - كارت 2 حجر", price: 293, qty: 10, code: "", cat: "بطاريات", img: "bat-d.jpg" },
-        { name: "إنرجايزر مربع (9V) قلوي", price: 250, qty: 10, code: "", cat: "بطاريات", img: "bat-9v.jpg" },
-        { name: "إنرجايزر عملة (CR2032) ليثيوم 3 فولت", price: 75, qty: 10, code: "", cat: "بطاريات", img: "bat-cr2032.jpg" },
-        { name: "إنرجايزر شحن قلم (AA) 2300mAh - كارت 2 حجر", price: 450, qty: 10, code: "", cat: "بطاريات", img: "bat-rechargeable.jpg" },
-        { name: "إنرجايزر شحن ريموت (AAA) 800mAh - كارت 2 حجر", price: 450, qty: 10, code: "", cat: "بطاريات", img: "bat-rechargeable.jpg" },
-        { name: "شاحن ماكسي + 4 حجارة (AA) 2000mAh", price: 1033, qty: 10, code: "", cat: "بطاريات", img: "charger-maxi.jpg" }
-    ];
 
     var CATS = ["الكل", "لمبات", "مفاتيح", "بريزات", "بطاريات"];
     var current = "الكل";
@@ -174,8 +144,9 @@
           (p.img ? '<img src="' + p.img + '" alt="" loading="lazy" onerror="this.remove()">' : '') + '</div>';
         html += '<div class="card">' + pic + '<div class="info">' +
           '<div class="name">' + p.name + '</div>' +
+          '<a class="gsearch" target="_blank" rel="noopener" href="https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(p.name) + '">🔍 صور</a>' +
           '<div class="line"><span class="price">' + (p.from ? 'يبدأ من ' : '') + p.price + ' جنيه</span>' +
-          '<span class="qty' + (p.qty > 0 ? '' : ' out') + '">' + (p.qty > 0 ? 'متوفر: ' + p.qty : 'خلصان') + '</span></div>' +
+          '<span class="qty' + (p.qty > 0 ? '' : ' out') + '">' + (p.qty > 0 ? 'متوفر' : 'خلصان') + '</span></div>' +
           '</div><div class="act">' + stepper(p) + '</div></div>';
       }
       document.getElementById("list").innerHTML = html || '<p>مفيش نتائج</p>';
